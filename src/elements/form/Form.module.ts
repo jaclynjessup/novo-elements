@@ -27,6 +27,7 @@ import { NovoTipWellModule } from './../tip-well/TipWell.module';
 import { NovoModalModule } from './../modal/Modal.module';
 import { ControlConfirmModal, ControlPromptModal } from './FieldInteractionModals';
 import { NovoControlGroup } from './ControlGroup';
+import { NovoPopOverModule } from '../popover/PopOver.module';
 
 @NgModule({
     imports: [
@@ -49,7 +50,8 @@ import { NovoControlGroup } from './ControlGroup';
         TextMaskModule,
         NovoTipWellModule,
         NovoModalModule,
-        NovoButtonModule
+        NovoButtonModule,
+        NovoPopOverModule
     ],
     declarations: [
         NovoAutoSize, NovoControlElement, NovoDynamicFormElement, NovoFormElement,

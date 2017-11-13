@@ -24,7 +24,7 @@ export interface NovoControlGroupAddConfig {
             <label class="novo-control-group-description" *ngIf="description" [attr.data-automation-id]="'novo-control-group-description-' + key">{{ description }}</label>
         </h6>
         <div class="novo-control-group-controls" [class.vertical]="vertical" [class.horizontal]="!vertical" [class.hidden]="collapsible && !toggled">
-            <div class="novo-control-group-labels" *ngIf="!vertical && form?.controls[key] && form?.controls[key]['controls'].length !== 0">
+            <div class="novo-control-group-labels" *ngIf="!vertical && form?.controls[key] && form?.controls[key]['controls'].length !== 0" [style.padding-left.px]="labelPadWidth">
                 <div class="novo-control-group-control-label" *ngFor="let label of controlLabels" [style.max-width.px]="label.width">
                     <span [attr.data-automation-id]="'novo-control-group-label-' + label.value">{{ label.value }}</span>
                 </div>
@@ -33,7 +33,11 @@ export interface NovoControlGroupAddConfig {
             </div>
             <ng-container *ngIf="form?.controls[key]">
                 <div class="novo-control-group-row" *ngFor="let control of form?.controls[key]['controls']; let i = index;">
+                    <span *ngIf="hasInfo && vertical" [tooltip]="info[i]" tooltipPosition="top-right"><i class="bhi-info"></i></span>
                     <div class="novo-control-group-control">
+                        <div class="novo-control-container first" *ngIf="info?.length && !vertical">
+                            <span [tooltip]="info[i]" tooltipPosition="top-right"><i class="bhi-info"></i></span>
+                        </div>
                         <div *ngFor="let c of controls" class="novo-control-container" [class.is-label]="c.controlType === 'read-only'" [style.max-width.px]="c.width">
                             <novo-control [form]="form?.controls[key]['controls'][i]" [control]="c" [condensed]="!vertical || c.controlType === 'read-only'"></novo-control>
                         </div>
@@ -110,6 +114,8 @@ export class NovoControlGroup implements AfterContentInit, OnChanges {
     // Message to display if there are no controls
     @Input() emptyMessage: string;
     // Icon of the control group (can have bhi prefix or not)
+    @Input() info: string[];
+    // Text to be displayed in the info button
     @Input()
     set icon(v: string) {
         this._icon = v && v.indexOf('bhi') !== -1 ? v : `bhi-${v}`;
@@ -130,6 +136,7 @@ export class NovoControlGroup implements AfterContentInit, OnChanges {
     public controlLabels: { value: string, width: number }[] = [];
     public toggled: boolean = false;
     public disabledArray: { edit: boolean, remove: boolean }[] = [];
+    public labelPadWidth: number = 0;
 
     private currentIndex: number = 0;
 
@@ -168,6 +175,11 @@ export class NovoControlGroup implements AfterContentInit, OnChanges {
                 };
             });
             this.ref.markForCheck();
+        }
+        if (this.info && this.info.length) {
+            this.labelPadWidth = 50;
+        } else {
+            this.labelPadWidth = 0;
         }
     }
 
@@ -208,6 +220,7 @@ export class NovoControlGroup implements AfterContentInit, OnChanges {
     public editControl(index: number): void {
         const control: FormArray = <FormArray>this.form.controls[this.key];
         this.onEdit.emit({ value: control.at(index).value, index: index });
+        this.ref.markForCheck();
     }
 
     public toggle(event: MouseEvent) {
